@@ -1,5 +1,5 @@
 <?php
-
+ 
 /**
  * Cinco dados - cinco-dados.php
  *

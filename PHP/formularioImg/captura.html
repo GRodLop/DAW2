@@ -1,0 +1,190 @@
+<!doctype html>
+<html lang="es">
+<head>
+    <meta charset="utf-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1">
+    <title>Formulario de Jugador</title>
+    <style>
+        * { box-sizing: border-box; }
+
+        body {
+            min-height: 100vh;
+            margin: 0;
+            padding: 20px 16px 36px;
+            color: #080808;
+            background: #9d9caf;
+            font-family: "Courier New", Courier, monospace;
+        }
+
+        h1 {
+            margin: 0 auto 18px;
+            text-align: center;
+            font-size: clamp(1.65rem, 5vw, 1.9rem);
+        }
+
+        .form-card {
+            width: min(100%, 484px);
+            margin: 0 auto;
+            padding: 18px;
+            background: #fff;
+            border-radius: 10px;
+            box-shadow: 0 5px 14px rgb(0 0 0 / 12%);
+        }
+
+        .field { margin: 0 0 16px; }
+
+        .field > label { display: block; margin-bottom: 6px; font-weight: 700; }
+
+        .text-input {
+            display: block;
+            width: 100%;
+            height: 32px;
+            padding: 6px 8px;
+            border: 1px solid #c9c9c9;
+            border-radius: 6px;
+            font: inherit;
+            background: #fff;
+        }
+
+        .text-input:focus {
+            outline: 2px solid #8c8ba4;
+        }
+
+        fieldset {
+            margin: 0 2px 20px;
+            padding: 7px 12px 13px;
+            border: 1px solid #e2e2e8;
+        }
+
+        legend { padding: 0 2px; }
+
+        .choices { display: grid; gap: 5px; }
+        .choices label { display: flex; align-items: center; gap: 10px; font-weight: 700; }
+        input[type="checkbox"], input[type="radio"] { accent-color: #f4511e; }
+
+        input[type="file"] {
+            display: block;
+            width: 100%;
+            padding: 7px;
+            border: 1px solid #c9c9c9;
+            border-radius: 6px;
+            font: inherit;
+        }
+
+        .hint {
+            display: block;
+            margin-top: 5px;
+            color: #555;
+            font-size: .78rem;
+        }
+
+        .hint.error { color: #a32218; font-weight: 700; }
+
+        .buttons { display: flex; gap: 9px; }
+
+        button {
+            padding: 9px 15px;
+            border: 0;
+            border-radius: 5px;
+            color: #fff;
+            background: #087df0;
+            font: inherit;
+            cursor: pointer;
+        }
+
+        button:hover { background: #0666c5; }
+    </style>
+</head>
+<body>
+    <h1>Formulario de Jugador</h1>
+    <main class="form-card">
+
+        <form method="POST" action="index.php" enctype="multipart/form-data">
+            <input type="hidden" name="MAX_FILE_SIZE" value="10240">
+
+            <div class="field">
+                <label for="nombre">Nombre</label>
+                <input class="text-input" type="text" id="nombre" name="nombre" maxlength="100" required>
+            </div>
+
+            <div class="field">
+                <label for="alias">Alias</label>
+                <input class="text-input" type="text" id="alias" name="alias" maxlength="100" required>
+            </div>
+
+            <div class="field">
+                <label for="edad">Edad</label>
+                <input class="text-input" type="number" id="edad" name="edad" min="0" max="130">
+            </div>
+
+            <fieldset>
+                <legend>Armas a elegir (puedes elegir varias):</legend>
+                <div class="choices">
+                    <label><input type="checkbox" name="armas[]" value="Maza"> Maza</label>
+                    <label><input type="checkbox" name="armas[]" value="Antorcha"> Antorcha</label>
+                    <label><input type="checkbox" name="armas[]" value="Martillo"> Martillo</label>
+                    <label><input type="checkbox" name="armas[]" value="Látigo"> Látigo</label>
+                </div>
+            </fieldset>
+
+            <fieldset>
+                <legend>¿Practica artes mágicas?</legend>
+                <div class="choices">
+                    <label><input type="radio" name="magia" value="Sí"> Sí</label>
+                    <label><input type="radio" name="magia" value="No"> No</label>
+                </div>
+            </fieldset>
+
+            <div class="field">
+                <label for="imagen">Subir imagen</label>
+                <input type="file" id="imagen" name="imagen" accept="image/png">
+                <span class="hint" id="ayuda-imagen" aria-live="polite">Opcional. Solo PNG, máximo 10 KB.</span>
+            </div>
+
+            <div class="buttons">
+                <button type="submit">Enviar</button>
+                <button type="reset">Borrar</button>
+            </div>
+        </form>
+    </main>
+    <script>
+        const inputImagen = document.getElementById('imagen');
+        const ayudaImagen = document.getElementById('ayuda-imagen');
+        const formulario = inputImagen.form;
+        const maximoBytes = 10240;
+
+        inputImagen.addEventListener('change', () => {
+            const archivo = inputImagen.files[0];
+            inputImagen.setCustomValidity('');
+            ayudaImagen.classList.remove('error');
+
+            if (!archivo) {
+                ayudaImagen.textContent = 'Opcional. Solo PNG, máximo 10 KB.';
+                return;
+            }
+
+            if (archivo.size > maximoBytes) {
+                inputImagen.setCustomValidity('La imagen supera el máximo permitido de 10 KB.');
+                ayudaImagen.textContent = `La imagen pesa ${(archivo.size / 1024).toFixed(1)} KB; el máximo permitido es 10 KB.`;
+                ayudaImagen.classList.add('error');
+                return;
+            }
+
+            if (archivo.type !== 'image/png') {
+                inputImagen.setCustomValidity('Selecciona un archivo PNG válido.');
+                ayudaImagen.textContent = 'El archivo seleccionado no es un PNG válido.';
+                ayudaImagen.classList.add('error');
+                return;
+            }
+
+            ayudaImagen.textContent = `PNG válido: ${(archivo.size / 1024).toFixed(1)} KB de 10 KB.`;
+        });
+
+        formulario.addEventListener('submit', (evento) => {
+            if (!inputImagen.reportValidity()) {
+                evento.preventDefault();
+            }
+        });
+    </script>
+</body>
+</html>
